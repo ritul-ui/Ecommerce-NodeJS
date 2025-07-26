@@ -1,11 +1,29 @@
 console.log("hey this from server.js");
 
+
 const fs = require("fs");
 const http = require("http");
+const mongoose = require("mongoose");
 
 const express = require("express");
 
 const app = express();
+
+//get the db connectionn strin gfrom config file
+
+const { mongoURI } = require("./config/key");
+mongoose
+  .connect(mongoURI)
+  .then(() => {
+    console.log("connected to mongodb");
+  })
+  .catch((err) => {
+    console.error("err", err);
+  });
+
+
+
+
 //middeware
 app.use(express.json()); //parse  our json data
 app.use(express.static("public"));
