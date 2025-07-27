@@ -1,70 +1,42 @@
-console.log("hey this from server.js");
-
-
-const fs = require("fs");
-const http = require("http");
-const mongoose = require("mongoose");
-
 const express = require("express");
+// require("crypto").randomBytes(64).toString("hex")
+const mongoose = require("mongoose");
 
 const app = express();
 
-//get the db connectionn strin gfrom config file
+// Get the DB connection URI from the config file
 
 const { mongoURI } = require("./config/key");
+
+console.log("MongoDB URI:", mongoURI);
+
+// Connect to MongoDB
+
 mongoose
   .connect(mongoURI)
   .then(() => {
-    console.log("connected to mongodb");
+    console.log("Connected to MongoDB");
   })
   .catch((err) => {
-    console.error("err", err);
+    console.error("Error connecting to MongoDB:", err);
   });
 
+//middleware
 
+app.use(express.json()); // parse our json data
 
-
-//middeware
-app.use(express.json()); //parse  our json data
 app.use(express.static("public"));
+
 app.use(express.urlencoded({ extended: true })); //parse the form data
 
-app.get("/", (req, res) => {
-  // res.send("hello !!")
+app.get("/", async (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 
-app.post("/add", (req, res) => {
-  const { num1, num2 } = req.body;
-  res.send(`the result of addition is ${num1 + num2}`);
-});
-// app.get("/add", (req, res) => {
-//   const val = 4 + 5;
-//   res.send(`the resukt of addition is ${val}`);
-// });
+app.use("/products", require("./routes/product"));
 
-// fs.writeFile("output.txt", "hello , this the output file", (err) => {
-//   if (err) {
-//     console.error("error writing file", err);
-//   } else {
-//     console.log("file written succcesfully");
-//   }
-// });
-
-// fs.readFile("output.txt", "utf-8", (err, data) => {
-//   if (err) console.error("error reading file", err);
-//   else console.log("file content", data);
-// });
-
-// const server = http.createServer((req, res) => {
-//   console.log("request recived", req.url);
-//   const url = req.url;
-//   if (url == "/") res.end("hello");
-//   if (url == "/add") res.end("hello add");
-//   if (url == "/subtract") res.end("hello subtract");
-//   res.end("hello, this is the respnse from the server!");
-// });
+app.use("/users", require("./routes/user"));
 
 app.listen(3000, () => {
-  console.log("server is listenning on port 3000");
+  console.log("Server is listening on port 3000");
 });
