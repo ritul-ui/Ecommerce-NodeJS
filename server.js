@@ -7,6 +7,7 @@ const app = express();
 // Get the DB connection URI from the config file
 
 const { mongoURI } = require("./config/key");
+const authenticateToken = require("./config/authHandler");
 
 console.log("MongoDB URI:", mongoURI);
 
@@ -36,6 +37,7 @@ app.get("/", async (req, res) => {
 app.use("/products", require("./routes/product"));
 
 app.use("/users", require("./routes/user"));
+app.use("/orders", authenticateToken, require("./routes/orders"));
 
 app.listen(3000, () => {
   console.log("Server is listening on port 3000");
